@@ -17,5 +17,17 @@ public class Helper {
             }
             }
         }
+
+    public static boolean isFieldEmpty(JTextField field){
+      return field.getText().trim().isEmpty();
+    }
+    public static boolean isFieldListEmpty(JTextField[] fields){
+        for(JTextField field : fields){
+            if(Helper.isFieldEmpty(field)) {
+                return true;
+            }
+        }
+        return false;
+    }
     }
 

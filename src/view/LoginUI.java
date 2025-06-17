@@ -1,9 +1,9 @@
 package view;
 
+import core.Helper;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class LoginUI extends JFrame {
     private JPanel container;
@@ -14,7 +14,7 @@ public class LoginUI extends JFrame {
     private JButton button_entry;
     private JLabel lbl_mail;
     private JLabel lbl_password;
-    private JPasswordField fl_password;
+    private JPasswordField fld_password;
 
     public LoginUI() {
         this.add(container);
@@ -26,7 +26,12 @@ public class LoginUI extends JFrame {
         this.setLocation(x, y);
 
         this.button_entry.addActionListener(e -> {
-
+            JTextField [] allFields = {this.fld_mail, this.fld_password};
+            if(Helper.isFieldListEmpty(allFields)){
+                System.out.println("Lütfen boş alanları doldurun");
+            }else{
+                System.out.println("Giriş başarılı");
+            }
         });
     }
 
