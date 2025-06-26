@@ -27,10 +27,15 @@ public class LoginUI extends JFrame {
 
         this.button_entry.addActionListener(e -> {
             JTextField [] allFields = {this.fld_mail, this.fld_password};
+            if (!Helper.isValidEmail(this.fld_mail.getText())){
+                Helper.showMsgPnl("Geçerli bir email adresi giriniz!");
+            }
+
             if(Helper.isFieldListEmpty(allFields)){
-                System.out.println("Lütfen boş alanları doldurun");
-            }else{
-                System.out.println("Giriş başarılı");
+                Helper.showMsgPnl("fill");
+            }
+            else{
+                Helper.showMsgPnl("info");
             }
         });
     }

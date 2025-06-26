@@ -18,6 +18,36 @@ public class Helper {
             }
         }
 
+    public static void alertBoxTR(){
+        UIManager.put("OptionPane.okButtonText", "Tamam");
+    }
+
+    public static void showMsgPnl(String msg){
+        alertBoxTR();
+        String message;
+        String title;
+        switch (msg) {
+            case "fill" -> {
+                message = "Tüm alanları doldurunuz!";
+                title = "HATA!";
+            }
+            case "info" -> {
+                message = "İşlem başarıyla tamamlandı!";
+                title = "Bilgi!";
+            }
+            case "error" -> {
+                message = "Bir sorun oluştu!";
+                title = "HATA!";
+            }
+            default -> {
+                message = msg;
+                title = "Bilgi!";
+            }
+        }
+
+        JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
+    }
+
     public static boolean isFieldEmpty(JTextField field){
       return field.getText().trim().isEmpty();
     }
@@ -28,6 +58,22 @@ public class Helper {
             }
         }
         return false;
+    }
+
+    public static boolean isValidEmail(String email){
+
+        if(email == null || email.trim().isEmpty()) return false;
+
+        if(!email.contains("@") || !email.contains(".")) return false;
+
+        String[] partMail = email.split("@");
+        if (partMail.length != 2) return false;
+
+        if(partMail[0].trim().isEmpty()||partMail[1].trim().isEmpty()) return false;
+
+        if(!partMail[1].contains(".")) return false;
+
+        return true;
     }
     }
 
