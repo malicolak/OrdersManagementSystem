@@ -11,10 +11,9 @@ import java.util.ArrayList;
 
 public class UserDao {
     private Connection connection;
-    public UserDao() {
+    public UserDao(){
         this.connection = DBManagement.getInstance();
     }
-
     public User checkLogin(String mail, String password){
         User user = new User();
         String sql = "select * from user where mail = ? and password = ?";

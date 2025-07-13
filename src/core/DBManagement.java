@@ -14,10 +14,8 @@ public class DBManagement {
 
     private DBManagement(){
         try {
-            System.out.println("bağlantı deneniyor");
             this.connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
         } catch (SQLException e) {
-            System.out.println("bağlantı hatası");
             throw new RuntimeException(e);
         }
     }
