@@ -14,8 +14,10 @@ public class DBManagement {
 
     private DBManagement(){
         try {
+            System.out.println("bağlantı deneniyor");
             this.connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
         } catch (SQLException e) {
+            System.out.println("bağlantı hatası");
             throw new RuntimeException(e);
         }
     }
@@ -26,7 +28,9 @@ public class DBManagement {
 
     public static Connection getInstance(){
         try {
-            if(instance == null|| instance.getConnection().isClosed()){}
+            if(instance == null|| instance.getConnection().isClosed()){
+                instance = new DBManagement();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

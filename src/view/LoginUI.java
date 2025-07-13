@@ -1,6 +1,9 @@
 package view;
 
+import business.UserController;
 import core.Helper;
+import entity.User;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,8 +18,10 @@ public class LoginUI extends JFrame {
     private JLabel lbl_mail;
     private JLabel lbl_password;
     private JPasswordField fld_password;
+    private UserController userController;
 
     public LoginUI() {
+        this.userController = new UserController();
         this.add(container);
         this.setTitle("Sipariş Yönetim Sistemi");
         this.setSize(400,400);
@@ -35,7 +40,13 @@ public class LoginUI extends JFrame {
                 Helper.showMsgPnl("fill");
             }
             else{
-                Helper.showMsgPnl("info");
+                User user = this.userController.checkLogin(this.fld_mail.getText(), this.fld_password.getText());
+                if(user == null){
+                    Helper.showMsgPnl("Böyle bir kayıt bulunamadı!");
+                }
+                else{
+                   System.out.println(user.toString());
+                }
             }
         });
     }
