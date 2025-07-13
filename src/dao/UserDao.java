@@ -16,7 +16,7 @@ public class UserDao {
     }
     public User checkLogin(String mail, String password){
         User user = new User();
-        String sql = "select * from user where mail = ? and password = ?";
+        String sql = "select * from users where mail = ? and password = ?";
 
         try {
             PreparedStatement ps = this.connection.prepareStatement(sql);
@@ -34,7 +34,7 @@ public class UserDao {
     public ArrayList<User> findAll(){
         ArrayList<User> users = new ArrayList<>();
         try {
-            ResultSet rs = this.connection.createStatement().executeQuery("select * from user");
+            ResultSet rs = this.connection.createStatement().executeQuery("select * from users");
             while(rs.next()){
                 users.add(this.match(rs));
             }
