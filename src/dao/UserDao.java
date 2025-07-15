@@ -15,15 +15,15 @@ public class UserDao {
         this.connection = DBManagement.getInstance();
     }
     public User checkLogin(String mail, String password){
-        User user = new User();
-        String sql = "select * from users where mail = ? and password = ?";
+        User user = null;
+        String sql = "SELECT * FROM users WHERE mail = ? AND password = ?";
 
         try {
             PreparedStatement ps = this.connection.prepareStatement(sql);
             ps.setString(1, mail);
             ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
-            if(rs.next()){
+            if (rs.next()){
                 user = this.match(rs);
             }
         } catch (SQLException e) {
@@ -34,7 +34,7 @@ public class UserDao {
     public ArrayList<User> findAll(){
         ArrayList<User> users = new ArrayList<>();
         try {
-            ResultSet rs = this.connection.createStatement().executeQuery("select * from users");
+            ResultSet rs = this.connection.createStatement().executeQuery("SELECT * FROM users");
             while(rs.next()){
                 users.add(this.match(rs));
             }
