@@ -45,7 +45,8 @@ public class LoginUI extends JFrame {
                     Helper.showMsgPnl("Böyle bir kayıt bulunamadı!");
                 }
                 else{
-                   System.out.println(user.toString());
+                   this.dispose();
+                   DashboardUI dashboardUI = new DashboardUI(user);
                 }
             }
         });
