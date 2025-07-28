@@ -11,5 +11,6 @@ public class App {
         UserController userController = new UserController();
         User user = userController.checkLogin("m.alicolak01@hotmail.com", "123456");
         DashboardUI dashboardUI = new DashboardUI(user);
+
     }
 }

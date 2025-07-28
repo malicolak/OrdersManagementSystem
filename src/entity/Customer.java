@@ -9,7 +9,7 @@ public class Customer {
     private CustomerType type;
 
     public enum CustomerType{
-        PERSONAL,
+        PERSON,
         COMPANY
     }
     public Customer() {
