@@ -20,6 +20,8 @@ public class Helper {
 
     public static void alertBoxTR(){
         UIManager.put("OptionPane.okButtonText", "Tamam");
+        UIManager.put("OptionPane.yesButtonText", "Evet");
+        UIManager.put("OptionPane.noButtonText", "Hayır");
     }
 
     public static void showMsgPnl(String msg){
@@ -46,6 +48,17 @@ public class Helper {
         }
 
         JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
+    }
+    public static boolean confirmMsgPnl(String msg){
+        alertBoxTR();
+        String message;
+        if(msg.equals("sure")){
+            message = "Emin misiniz?";
+        }else{
+            message = msg;
+        }
+
+        return JOptionPane.showConfirmDialog(null,message,"Uyarı!",JOptionPane.YES_NO_OPTION) == 0;
     }
 
     public static boolean isFieldEmpty(JTextField field){

@@ -1,10 +1,13 @@
 package view;
 
 import business.CustomerController;
+import core.Helper;
 import entity.Customer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class CustomerUI extends JFrame {
     private JPanel container;
@@ -37,10 +40,43 @@ public class CustomerUI extends JFrame {
 
         this.cbox_type.setModel(new DefaultComboBoxModel<>(Customer.CustomerType.values()));
 
-        if(customer.getId() != 0){
+        if(this.customer.getId() == 0){
             this.lbl_title.setText("Müşteri Ekle!");
         }else{
             this.lbl_title.setText("Müşteri Düzenle!");
+            this.fld_name.setText(this.customer.getName());
+            this.cbox_type.getModel().setSelectedItem(this.customer.getType());
+            this.fld_phoneno.setText(this.customer.getPhone());
+            this.fld_mail.setText(this.customer.getMail());
+            this.tArea_address.setText(this.customer.getAddress());
         }
+        this.button_save.addActionListener(e -> {
+            JTextField[] checkList = {this.fld_name,this.fld_phoneno};
+            if(Helper.isFieldListEmpty(checkList)){
+                Helper.showMsgPnl("fill");
+            }else if(!Helper.isFieldEmpty(this.fld_mail) && !Helper.isValidEmail(this.fld_mail.getText())){
+                Helper.showMsgPnl("Lütfen geçerli bir e-posta adresi giriniz!");
+            }else{
+                boolean isSave = false;
+                this.customer.setName(this.fld_name.getText());
+                this.customer.setType((Customer.CustomerType) this.cbox_type.getSelectedItem());
+                this.customer.setPhone(this.fld_phoneno.getText());
+                this.customer.setMail(this.fld_mail.getText());
+                this.customer.setAddress(this.tArea_address.getText());
+                if(this.customer.getId() == 0){
+                    isSave = this.customerController.save(this.customer);
+                }else {
+                    isSave = this.customerController.update(this.customer);
+                }
+
+                if(isSave){
+                    Helper.showMsgPnl("info");
+                    dispose();
+
+                }else{
+                    Helper.showMsgPnl("error");
+                }
+            }
+        });
     }
 }
