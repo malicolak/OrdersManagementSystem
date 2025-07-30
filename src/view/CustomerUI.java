@@ -70,8 +70,8 @@ public class CustomerUI extends JFrame {
                 }
 
                 if(isSave){
-                    Helper.showMsgPnl("info");
                     dispose();
+                    Helper.showMsgPnl("info");
 
                 }else{
                     Helper.showMsgPnl("error");
