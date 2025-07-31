@@ -57,7 +57,6 @@ public class Helper {
         }else{
             message = msg;
         }
-
         return JOptionPane.showConfirmDialog(null,message,"Uyarı!",JOptionPane.YES_NO_OPTION) == 0;
     }
 
