@@ -3,6 +3,7 @@ package view;
 import business.CustomerController;
 import business.ProductController;
 import core.Helper;
+import core.Item;
 import entity.Customer;
 import entity.Product;
 import entity.User;
@@ -35,7 +36,7 @@ public class DashboardUI extends JFrame {
     private JPanel pnl_fltr_product;
     private JTextField fld_filtprod_name;
     private JTextField fld_filtprod_code;
-    private JComboBox cbox_filtprod_stock;
+    private JComboBox<Item> cbox_filtprod_stock;
     private JButton btn_filtprod_find;
     private JButton btn_filtprod_reset;
     private JButton btn_addprod;
@@ -85,6 +86,9 @@ public class DashboardUI extends JFrame {
         loadProductTable(null);
         loadProductPopupMenu();
         loadProductButtonEvent();
+        this.cbox_filtprod_stock.addItem(new Item(1,"VAR"));
+        this.cbox_filtprod_stock.addItem(new Item(0,"YOK"));
+        this.cbox_filtprod_stock.setSelectedItem(null);
 
     }
     private void loadProductButtonEvent(){
@@ -99,7 +103,19 @@ public class DashboardUI extends JFrame {
 
             );
         });
-
+        this.btn_filtprod_find.addActionListener(e -> {
+            ArrayList<Product> products = this.productController.queries(
+                    this.fld_filtprod_name.getText(),
+                    this.fld_filtprod_code.getText(),
+                    (Item) this.cbox_filtprod_stock.getSelectedItem());
+            loadProductTable(products);
+        });
+        this.btn_filtprod_reset.addActionListener(e -> {
+            this.fld_filtprod_name.setText("");
+            this.fld_filtprod_code.setText("");
+            this.cbox_filtprod_stock.setSelectedItem(null);
+            loadProductTable(null);
+        });
     }
     private void loadProductPopupMenu(){
         this.tbl_product.addMouseListener(new MouseAdapter() {

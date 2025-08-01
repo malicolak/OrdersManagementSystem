@@ -30,7 +30,7 @@ public class ProductUI extends JFrame {
 
         this.add(container);
         this.setTitle("Ürün Ekle ve Düzenle");
-        this.setSize(500,800);
+        this.setSize(500,350);
         this.setVisible(true);
         int x = (Toolkit.getDefaultToolkit().getScreenSize().width - this.getSize().width) / 2;
         int y = (Toolkit.getDefaultToolkit().getScreenSize().height - this.getSize().height) / 2;
@@ -49,25 +49,32 @@ public class ProductUI extends JFrame {
             JTextField[] checkList = {this.fld_name,this.fld_code,this.fld_price,this.fld_stock};
             if(Helper.isFieldListEmpty(checkList)){
                 Helper.showMsgPnl("fill");
-            }else {
-                boolean isSave = false;
-                this.product.setName(this.fld_name.getText());
-                this.product.setCode(this.fld_code.getText());
-                this.product.setPrice(Integer.parseInt(this.fld_price.getText()));
-                this.product.setStock(Integer.parseInt(this.fld_stock.getText()));
-                if(this.product.getId() == 0){
-                    isSave = this.productController.save(this.product);
+            } else {
+                try {
+                    boolean isSave = false;
+                    this.product.setName(this.fld_name.getText());
+                    this.product.setCode(this.fld_code.getText());
+                    this.product.setPrice(Integer.parseInt(this.fld_price.getText()));
+                    this.product.setStock(Integer.parseInt(this.fld_stock.getText()));
+                    if (Integer.parseInt(this.fld_price.getText()) <= 0 || Integer.parseInt(this.fld_stock.getText()) <= 0) {
+                        Helper.showMsgPnl("Stok ve fiyat bilgisi negatif olamaz!");
+                    } else {
+                        if (this.product.getId() == 0) {
+                            isSave = this.productController.save(this.product);
 
-                }else{
-                    isSave = this.productController.update(this.product);
+                        } else {
+                            isSave = this.productController.update(this.product);
+                        }
+                        if (isSave) {
+                            dispose();
+                            Helper.showMsgPnl("info");
+                        } else {
+                            Helper.showMsgPnl("error");
+                        }
+                    }}catch(NumberFormatException ex){
+                        Helper.showMsgPnl("Lütfen fiyat ve stok bilgisine sadece rakam giriniz!");
+                    }
                 }
-                if(isSave){
-                    dispose();
-                    Helper.showMsgPnl("info");
-                }else{
-                    Helper.showMsgPnl("error");
-                }
-            }
         });
     }
 }
