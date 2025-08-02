@@ -1,9 +1,11 @@
 package view;
 
+import business.BasketController;
 import business.CustomerController;
 import business.ProductController;
 import core.Helper;
 import core.Item;
+import entity.Basket;
 import entity.Customer;
 import entity.Product;
 import entity.User;
@@ -43,22 +45,36 @@ public class DashboardUI extends JFrame {
     private JLabel lbl_filtprod_name;
     private JLabel lbl_filtprod_code;
     private JLabel lbl_filtprod_stock;
+    private JPanel pnl_basket;
+    private JScrollPane scrl_basket;
+    private JPanel pnl_basket_top;
+    private JLabel lbl_customer;
+    private JComboBox cbox_basket_cust;
+    private JButton btn_basket_clear;
+    private JButton btn_basket_new;
+    private JLabel lbl_basket_cost;
+    private JLabel lbl_basket_count;
+    private JTable tbl_basket;
     private JLabel lbl_top;
     private DefaultTableModel tmodel_customer;
     private DefaultTableModel tmodel_product;
+    private DefaultTableModel tmodel_basket;
     private User user;
     private CustomerController customerController;
     private ProductController productController;
+    private BasketController basketController;
     private JPopupMenu popupMenu_customer;
     private JPopupMenu popupMenu_product;
     public DashboardUI(User user) {
         this.tmodel_customer = new DefaultTableModel();
         this.tmodel_product = new DefaultTableModel();
+        this.tmodel_basket = new DefaultTableModel();
         this.user = user;
         this.customerController = new CustomerController();
         this.popupMenu_customer = new JPopupMenu();
         this.productController = new ProductController();
         this.popupMenu_product = new JPopupMenu();
+        this.basketController = new BasketController();
         if(user == null){
             Helper.showMsgPnl("error");
             this.dispose();
@@ -90,6 +106,38 @@ public class DashboardUI extends JFrame {
         this.cbox_filtprod_stock.addItem(new Item(0,"YOK"));
         this.cbox_filtprod_stock.setSelectedItem(null);
 
+        //Basket bölgesi
+        loadBasketTable();
+
+    }
+    private void loadBasketTable(){
+        Object [] dataBasket = {"ID", "Ürün Adı", "Ürün Kodu", "Fiyat", "Stok Durumu"};
+        ArrayList<Basket> baskets = this.basketController.findAll();
+
+        //Tablo temizleme işlemi
+        DefaultTableModel clearModel = (DefaultTableModel) this.tbl_basket.getModel();
+        clearModel.setRowCount(0);
+
+        this.tmodel_basket.setColumnIdentifiers(dataBasket);
+        int totalCost = 0;
+        for(Basket basket : baskets){
+            Object [] data = {
+                    basket.getId(),
+                    basket.getProduct().getName(),
+                    basket.getProduct().getCode(),
+                    basket.getProduct().getPrice(),
+                    basket.getProduct().getStock()
+            };
+            this.tmodel_basket.addRow(data);
+            totalCost += basket.getProduct().getPrice();
+        }
+            this.lbl_basket_cost.setText(totalCost + " TL");
+            this.lbl_basket_count.setText(baskets.size() + " adet");
+
+        this.tbl_basket.setModel(this.tmodel_basket);
+        this.tbl_basket.getTableHeader().setReorderingAllowed(false);
+        this.tbl_basket.getColumnModel().getColumn(0).setMaxWidth(50);
+        this.tbl_basket.setEnabled(false);
     }
     private void loadProductButtonEvent(){
         this.btn_addprod.addActionListener(e -> {
@@ -126,7 +174,21 @@ public class DashboardUI extends JFrame {
             }
         });
 
-
+        this.popupMenu_product.add("Sepete Ekle").addActionListener(e -> {
+            int selectedRowId = Integer.parseInt(tbl_product.getValueAt(tbl_product.getSelectedRow(),0).toString());
+            Product basketProduct = this.productController.getById(selectedRowId);
+            if(basketProduct.getStock() == 0){
+                Helper.showMsgPnl("Bu ürün stokta yok!");
+            }else{
+                Basket tempBasket = new Basket(basketProduct.getId());
+                boolean result = this.basketController.save(tempBasket);
+                if(result){
+                    Helper.showMsgPnl("info");
+                }else{
+                    Helper.showMsgPnl("error");
+                }
+            }
+        });
         this.popupMenu_product.add("Güncelle").addActionListener(e -> {
             int selectedRowId = Integer.parseInt(tbl_product.getValueAt(tbl_product.getSelectedRow(), 0).toString());
             ProductUI productUI = new ProductUI(this.productController.getById(selectedRowId));
@@ -134,6 +196,7 @@ public class DashboardUI extends JFrame {
                 @Override
                 public void windowClosed(WindowEvent e) {
                     loadProductTable(null);
+                    loadBasketTable();
                 }
             });
         });
@@ -143,6 +206,7 @@ public class DashboardUI extends JFrame {
             if(isDelete){
                 this.productController.delete(selectedRowId);
                 loadProductTable(null);
+                loadBasketTable();
                 Helper.showMsgPnl("info");
             }
         });
