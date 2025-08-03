@@ -1,14 +1,12 @@
 package view;
 
 import business.BasketController;
+import business.CartController;
 import business.CustomerController;
 import business.ProductController;
 import core.Helper;
 import core.Item;
-import entity.Basket;
-import entity.Customer;
-import entity.Product;
-import entity.User;
+import entity.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -55,26 +53,33 @@ public class DashboardUI extends JFrame {
     private JLabel lbl_basket_cost;
     private JLabel lbl_basket_count;
     private JTable tbl_basket;
+    private JPanel pnl_cart;
+    private JTable tbl_cart;
+    private JScrollPane scrl_cart;
     private JLabel lbl_top;
     private DefaultTableModel tmodel_customer;
     private DefaultTableModel tmodel_product;
     private DefaultTableModel tmodel_basket;
+    private DefaultTableModel tmodel_cart;
     private User user;
     private CustomerController customerController;
     private ProductController productController;
     private BasketController basketController;
+    private CartController cartController;
     private JPopupMenu popupMenu_customer;
     private JPopupMenu popupMenu_product;
     public DashboardUI(User user) {
         this.tmodel_customer = new DefaultTableModel();
         this.tmodel_product = new DefaultTableModel();
         this.tmodel_basket = new DefaultTableModel();
+        this.tmodel_cart = new DefaultTableModel();
         this.user = user;
         this.customerController = new CustomerController();
         this.popupMenu_customer = new JPopupMenu();
         this.productController = new ProductController();
         this.popupMenu_product = new JPopupMenu();
         this.basketController = new BasketController();
+        this.cartController = new CartController();
         if(user == null){
             Helper.showMsgPnl("error");
             this.dispose();
@@ -108,7 +113,83 @@ public class DashboardUI extends JFrame {
 
         //Basket bölgesi
         loadBasketTable();
+        loadBasketButtonEvent();
+        loadBasketFillCustomer();
 
+        //Cart bölgesi
+        loadCartTable();
+    }
+    private void loadCartTable(){
+        Object [] dataCart = {"ID", "Müşteri Adı", "Ürün Adı", "Fiyat", "Sipariş Tarihi", "Sipariş Notu"};
+        ArrayList<Cart> carts = this.cartController.findAll();
+
+        //Tablo temizleme işlemi
+        DefaultTableModel clearModel = (DefaultTableModel) this.tbl_cart.getModel();
+        clearModel.setRowCount(0);
+
+        this.tmodel_cart.setColumnIdentifiers(dataCart);
+        for(Cart cart : carts){
+            Object [] data = {
+                    cart.getId(),
+                    cart.getCustomer().getName(),
+                    cart.getProduct().getName(),
+                    cart.getPrice(),
+                    cart.getDate(),
+                    cart.getNote()
+            };
+            this.tmodel_cart.addRow(data);
+        }
+        this.tbl_cart.setModel(this.tmodel_cart);
+        this.tbl_cart.getTableHeader().setReorderingAllowed(false);
+        this.tbl_cart.getColumnModel().getColumn(0).setMaxWidth(50);
+        this.tbl_cart.setEnabled(false);
+    }
+    private void loadBasketFillCustomer(){
+        ArrayList<Customer> customers = this.customerController.findAll();
+        this.cbox_basket_cust.removeAllItems();
+        for(Customer customer : customers){
+            int custid = customer.getId();
+            String custname = customer.getName().toString();
+            this.cbox_basket_cust.addItem(new Item(custid,custname));
+        }
+        this.cbox_basket_cust.setSelectedItem(null);
+    }
+    private void loadBasketButtonEvent(){
+        btn_basket_clear.addActionListener(e -> {
+            if(this.basketController.clear()){
+                loadBasketTable();
+                this.cbox_basket_cust.setSelectedItem(null);
+                Helper.showMsgPnl("Sepet Temizlendi!");
+            }else{
+                Helper.showMsgPnl("error");
+            }
+        });
+        btn_basket_new.addActionListener(e -> {
+            Item selectedCustomer = (Item) this.cbox_basket_cust.getSelectedItem();
+            if(selectedCustomer == null){
+                Helper.showMsgPnl("Lütfen bir müşteri seçiniz!");
+            }
+            else{
+                Customer customer = this.customerController.getById(selectedCustomer.getKey());
+                ArrayList<Basket> baskets = this.basketController.findAll();
+                if(customer.getId() == 0){
+                    Helper.showMsgPnl("Kayıtlı müşteri bulunamadı!");
+                }else if(baskets.size() == 0){
+                    Helper.showMsgPnl("Sipariş vermek için sepete ürün ekleyiniz!");
+                }else{
+                    CartUI cartUI = new CartUI(customer);
+                    cartUI.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosed(WindowEvent e) {
+                            loadBasketTable();
+                            loadProductTable(null);
+                            loadCartTable();
+                            cbox_basket_cust.setSelectedItem(null);
+                        }
+                    });
+                }
+            }
+        });
     }
     private void loadBasketTable(){
         Object [] dataBasket = {"ID", "Ürün Adı", "Ürün Kodu", "Fiyat", "Stok Durumu"};
@@ -181,9 +262,9 @@ public class DashboardUI extends JFrame {
                 Helper.showMsgPnl("Bu ürün stokta yok!");
             }else{
                 Basket tempBasket = new Basket(basketProduct.getId());
-                boolean result = this.basketController.save(tempBasket);
-                if(result){
-                    Helper.showMsgPnl("info");
+                if(this.basketController.save(tempBasket)){
+                    loadBasketTable();
+                    Helper.showMsgPnl("Başarıyla sepete eklendi!");
                 }else{
                     Helper.showMsgPnl("error");
                 }
@@ -249,6 +330,7 @@ public class DashboardUI extends JFrame {
                 @Override
                 public void windowClosed(WindowEvent e) {
                     loadCustomerTable(null);
+                    loadBasketFillCustomer();
                 }
             }
 
@@ -280,6 +362,7 @@ public class DashboardUI extends JFrame {
                 @Override
                 public void windowClosed(WindowEvent e) {
                     loadCustomerTable(null);
+                    loadBasketFillCustomer();
                 }
             });
         });
@@ -289,6 +372,7 @@ public class DashboardUI extends JFrame {
             if(isDelete){
                 this.customerController.delete(selectedRowId);
                 loadCustomerTable(null);
+                loadBasketFillCustomer();
                 Helper.showMsgPnl("info");
             }
         });
