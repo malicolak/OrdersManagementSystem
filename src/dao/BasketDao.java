@@ -31,6 +31,16 @@ public class BasketDao {
         }
         return true;
     }
+    public boolean clear(){
+        String sql = "DELETE FROM baskets";
+        try {
+            PreparedStatement ps = this.connection.prepareStatement(sql);
+            return ps.executeUpdate() != -1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
     public ArrayList<Basket> findAll(){
         ArrayList<Basket> baskets = new ArrayList<>();
         try {

@@ -14,4 +14,7 @@ public class BasketController {
     public ArrayList<Basket> findAll(){
         return this.basketDao.findAll();
     }
+    public boolean clear(){
+        return this.basketDao.clear();
+    }
 }
