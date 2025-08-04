@@ -12,6 +12,7 @@ public class Cart {
     private int price;
     private LocalDate date;
     private String note;
+    private int quantity;
 
     public Cart(){
 

@@ -67,7 +67,9 @@ public class CartUI extends JFrame{
             }
             else{
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                for(Basket basket : baskets){
+                ArrayList<Basket> processingBaskets = new ArrayList<>(baskets);
+                for(Basket basket : processingBaskets){
+
                     if(basket.getProduct().getStock() <= 0) continue;
 
                     Cart cart = new Cart();
@@ -77,9 +79,14 @@ public class CartUI extends JFrame{
                     cart.setDate(LocalDate.parse(this.fld_cart_date.getText(),dtf));
                     cart.setNote(this.tarea_cart_note.getText());
                     this.cartController.save(cart);
-                    Product product = basket.getProduct();
-                    product.setStock(product.getStock() - 1);
-                    this.productController.update(product);
+                    basket.getProduct().setStock(basket.getProduct().getStock() - 1);
+                    this.productController.update(basket.getProduct());
+
+                    for(Basket tempBasket : processingBaskets){
+                        if(tempBasket.getProductId() == basket.getProductId()){
+                            tempBasket.getProduct().setStock(basket.getProduct().getStock());
+                        }
+                    }
                 }
                 Helper.showMsgPnl("info");
                 this.basketController.clear();
